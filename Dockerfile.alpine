@@ -1,0 +1,59 @@
+FROM elixir:1.16.2-alpine as build
+
+ARG parameter_mix_env
+ENV MIX_ENV=${parameter_mix_env?}
+
+# to-do consider apk --no-cache ...; apk add --no-cached ...
+# when you use --no-cache no need for the option --update
+# and remove ` `rm /var/cache/apk/*` (with/in-case-of installing packages)
+RUN --mount=type=cache,target=/var/cache/apk/ \
+  apk --no-cache --available --force-missing-repositories upgrade && \
+  apk add --no-cache git~=2.43 inotify-tools~=4.23 && \
+  rm -rf /tmp/* /var/log/*
+
+WORKDIR /app
+
+  #--mount=type=bind,source=mix.lock,target=mix.lock \
+RUN \
+  --mount=type=cache,target=/root/.mix \
+  --mount=type=cache,target=/root/.hex \
+  --mount=type=bind,source=mix.exs,target=mix.exs \
+  --mount=type=bind,source=config/config.exs,target=config/config.exs \
+  --mount=type=bind,source=config/${MIX_ENV}.exs,target=config/${MIX_ENV}.exs \
+  --mount=type=bind,source=VERSION,target=VERSION \
+  --mount=type=bind,source=lib,target=lib \
+  --mount=type=bind,source=config/runtime.exs,target=config/runtime.exs \
+  --mount=type=bind,source=assets,target=assets,rw \
+  MIX_ENV=${MIX_ENV} mix "do" \
+  archive.install github hexpm/hex branch latest \
+  + deps.get + deps.compile \
+  + compile \
+  + assets.setup + assets.build + assets.deploy \
+  + release --path /kans_release
+
+COPY priv priv
+
+COPY assets assets
+
+COPY rel rel
+
+COPY mix.exs .
+COPY VERSION .
+COPY lib lib
+COPY config/config.exs config/
+COPY config/${MIX_ENV}.exs ./config/
+COPY config/runtime.exs ./config/
+
+FROM build as release
+
+COPY --from=build --chown=10000:10000 /app /app
+COPY --from=build --chown=10000:10000 /kans_release /
+
+WORKDIR /app
+
+USER 10000:10000
+
+ENV PHX_HOST="jpat.test"
+ENV PHX_SERVER=true
+
+CMD ["/bin/kans", "start"]

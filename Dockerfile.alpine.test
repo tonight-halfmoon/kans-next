@@ -1,0 +1,75 @@
+FROM elixir:1.16.2-alpine as compile
+
+WORKDIR /src
+
+ENV MIX_ENV="test"
+
+RUN \
+  --mount=type=cache,target=/var/cache/apk/ \
+  apk --no-cache --update --available --force-missing-repositories upgrade && \
+  apk add --no-cache git~=2.43 openssl~=3.1.5 && \
+  apk add --no-cache mkcert~=1.4.4 --update-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing/ --allow-untrusted && \
+  rm -rf /tmp/* /var/log/* && \
+  addgroup --gid 10000 -S jpat && \
+  adduser --uid 10000 -G jpat -S jpat && \
+  mkdir -p /etc/tls && \
+  mkdir -p /etc/ssl && \
+  mkcert -install && \
+  cp "$(mkcert -CAROOT)"/rootCA.pem /etc/ssl/certs/ca.crt && \
+  cp "$(mkcert -CAROOT)"/rootCA-key.pem /etc/ssl/certs/ca.key && \
+  chown 10000:10000 /etc/tls && \
+  chown 10000:10000 /etc/ssl/certs
+
+  # --mount=type=bind,source=mix.lock,target=mix.lock \
+RUN \
+  --mount=type=cache,target=/root/.hex \
+  --mount=type=cache,target=/root/.mix \
+  --mount=type=bind,source=mix.exs,target=mix.exs \
+  --mount=type=bind,source=VERSION,target=VERSION \
+  --mount=type=bind,source=config/config.exs,target=config/config.exs \
+  --mount=type=bind,source=config/${MIX_ENV}.exs,target=config/${MIX_ENV}.exs \
+  --mount=type=bind,source=lib,target=lib \
+  MIX_ENV=${MIX_ENV} mix "do" \
+    archive.install github hexpm/hex branch latest \
+    + deps.get + deps.compile \
+    + compile
+
+COPY ./mix.exs ./
+COPY ./VERSION ./
+COPY ./lib ./lib
+COPY ./test ./test
+COPY ./config/config.exs ./config/
+COPY ./config/${MIX_ENV}.exs ./config/
+COPY ./priv ./priv
+
+FROM compile as test
+
+ENV MIX_ENV="test"
+
+RUN <<EOT
+  mkcert -key-file /etc/tls/tls.key -cert-file /etc/tls/tls.crt jpat.test "*.jpat.test"
+  chown 10000:10000 /etc/tls/tls.key
+  chown 10000:10000 /etc/tls/tls.crt
+  tls_key=/etc/tls/client.key
+  tls_crt=/etc/tls/client.crt
+  tls_csr=/etc/tls/client.csr
+  subject=jpat.client
+  openssl genrsa -out ${tls_key} 4096
+  openssl req -new -key ${tls_key} -subj "/CN=${subject}" -out ${tls_csr}
+  openssl x509 -req -in ${tls_csr} -CA /etc/ssl/certs/ca.crt -CAkey /etc/ssl/certs/ca.key -out ${tls_crt} -days 1 -sha256
+  chown 10000:10000 /etc/tls/client.crt
+  chown 10000:10000 /etc/tls/client.key
+EOT
+
+USER 10000
+
+ENV HOME=/home/jpat
+
+WORKDIR ${HOME}/src
+
+COPY --from=compile --chown=10000:10000 /src .
+
+RUN \
+  MIX_ENV=${MIX_ENV} mix "do" local.hex --force
+
+CMD ["mix", "ci_testing"]

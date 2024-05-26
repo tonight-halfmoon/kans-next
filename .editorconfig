@@ -1,0 +1,20 @@
+; This file is for unifying the coding style for different editors and IDEs.
+; More information at http://EditorConfig.org
+
+root = true
+
+[*]
+end_of_line = LF
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{el,yml,yaml,sh,bash,*}]
+indent_style = space
+
+[*.{yml,yaml}]
+max_line_length = 220
+
+[Makefile]
+indent_style = tab
+max_line_length = 198
