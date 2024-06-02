@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.allow-http: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /health
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+  labels:
+    app.kubernetes.io/part-of: jpat
+  name: back-end-ingress-healthz
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: jpat.test
+      http:
+        paths:
+          - backend:
+              service:
+                name: nodeport
+                port:
+                  number: 8082
+            path: /healthz
+            pathType: Exact
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - jpat.test

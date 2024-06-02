@@ -1,0 +1,19 @@
+apiVersion: builtin
+kind: LabelTransformer
+metadata:
+  name: kans-back-end-elixir-dev
+labels:
+  app.kubernetes.io/version: 0.4.21
+fieldSpecs:
+  - kind: Deployment
+    path: metadata/labels
+    create: true
+  - kind: Deployment
+    path: spec/template/metadata/labels
+    create: true
+  - kind: Service
+    path: metadata/labels
+    create: true
+  - kind: Ingress
+    path: metadata/labels
+    create: true

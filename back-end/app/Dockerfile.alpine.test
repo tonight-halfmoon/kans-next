@@ -6,10 +6,9 @@ ENV MIX_ENV="test"
 
 RUN \
   --mount=type=cache,target=/var/cache/apk/ \
-  apk --no-cache --update --available --force-missing-repositories upgrade && \
-  apk add --no-cache git~=2.43 openssl~=3.1.5 && \
-  apk add --no-cache mkcert~=1.4.4 --update-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing/ --allow-untrusted && \
-  rm -rf /tmp/* /var/log/* && \
+  apk --no-cache --update-cache --force-missing-repositories upgrade && \
+  apk add --no-cache git~=2.43 openssl~=3.1.5 \
+    mkcert~=1.4.4 --update-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing/ --allow-untrusted && \
   addgroup --gid 10000 -S jpat && \
   adduser --uid 10000 -G jpat -S jpat && \
   mkdir -p /etc/tls && \

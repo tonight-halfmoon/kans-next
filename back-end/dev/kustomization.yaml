@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base
+  - namespace.yaml
+namePrefix: dev-
+namespace: kans-elixir-dev
+images:
+  - name: back-end-elixir
+    newTag: 0.1.0

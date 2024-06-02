@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: memory-min-max
+spec:
+  limits:
+    - max:
+        memory: 256Mi
+      min:
+        memory: 16Mi
+      type: Container

@@ -3,13 +3,10 @@ FROM elixir:1.16.2-alpine as build
 ARG parameter_mix_env
 ENV MIX_ENV=${parameter_mix_env?}
 
-# to-do consider apk --no-cache ...; apk add --no-cached ...
-# when you use --no-cache no need for the option --update
-# and remove ` `rm /var/cache/apk/*` (with/in-case-of installing packages)
-RUN --mount=type=cache,target=/var/cache/apk/ \
-  apk --no-cache --available --force-missing-repositories upgrade && \
-  apk add --no-cache git~=2.43 inotify-tools~=4.23 && \
-  rm -rf /tmp/* /var/log/*
+RUN \
+  --mount=type=cache,target=/var/cache/apk/ \
+  apk --no-cache --update-cache --force-missing-repositories upgrade && \
+  apk add --no-cache git~=2.43 inotify-tools~=4.23
 
 WORKDIR /app
 

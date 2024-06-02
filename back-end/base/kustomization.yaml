@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - service.yaml
+  - deployment.yaml
+  - ingress.yaml
+  - ingress-healthz.yaml
+  - limit-range.yaml
+configMapGenerator:
+  - name: port-env-config
+    envs:
+      - ./envs/ports.envs
+    options:
+      disableNameSuffixHash: true
+buildMetadata:
+  - originAnnotations
+generators:
+  - ./secret-generator.yaml
+# transformers:
+#   - annotation-deployment-default-container.yaml

@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.allow-http: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.org/ssl-services: nodeport
+  labels:
+    app.kubernetes.io/part-of: jpat
+  name: back-end-ingress
+spec:
+  tls:
+    - hosts:
+        - jpat.test
+      secretName: tls-secret
+  ingressClassName: nginx
+  rules:
+    - host: jpat.test
+      http:
+        paths:
+          - backend:
+              service:
+                name: nodeport
+                port:
+                  number: 4009
+            path: /
+            pathType: Prefix

@@ -3,138 +3,20 @@
 help:
 	@perl -nle'print $& if m{^[a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[37;2;1m%-17s\033[32;m %s\n", $$1, $$2}'
 
-port := 4000
-
-MIX_ENV ?=""
-
-ifeq ($(MIX_ENV),)
-	$(error Expected MIX_ENV to be set!)
-endif
-
-ifeq ($(MIX_ENV), dev)
-	port := 4001
-else
-	port := 4000
-endif
-
-source_rev := $(shell tr -d '\n' <./VERSION)
+repo_root_dir := $(CURRDIR)
 
 export
 
-install: ## Run the initial setup; i.e, install mix dependencies, etc... *(local)
-	mix local.hex --force
-	mix deps.get
-	mix deps.compile
-	mix compile
+deploy: ## Kustomize Build with plugins enabled and pipe to kubectl apply
+	kustomize build --enable-alpha-plugins --enable-exec $(repo_root_dir) | kubectl apply --filename -
 
-release_gen: ## Generate release files
-	mix phx.gen.release
+deploy_monitoring_installation: ## Monitoring installation
+	helm repo add prometheus-community \
+		https://prometheus-community.github.io/helm-charts
+	helm upgrade --install \
+		-f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/samples/monitoring/kube-stack-config.yaml \
+		prometheus-community \
+		prometheus-community/kube-prometheus-stack
 
-server: ## Start the web server *(local)
-	mix phx.server
-
-ecto_setup: ## Set up database with Ecto and run mix ecto.{create,migrate} *(local)
-	createuser ci_dev
-	createdb kans_dev --owner=ci_dev --username=ci_dev
-	pg_ctl start
-	mix ecto.create
-	mix ecto.migrate
-
-testing: ## Run tests *(local)
-ifeq ($(MIX_ENV), test)
-	MIX_ENV=$(MIX_ENV) mix "do" \
-		deps.get \
-		+ deps.compile \
-		+ compile \
-		+ ecto.create --quiet \
-		+ ecto.migrate --quiet \
-		+ test --seed 87234
-else
-	$(error Expected MIX_ENV to be set with value test!)
-endif
-
-image_build: ## Build an image for the server (docker)
-	docker build \
-		--build-arg parameter_mix_env=$(MIX_ENV) \
-		--label kans.source_revision=$(source_rev) \
-		--tag kans-elixir-lv:$(source_rev) \
-		--file Dockerfile.alpine \
-		.
-
-container_run: ## Start the server on a container (docker)
-ifeq ($(MIX_ENV), test)
-	$(error We do not run a server during test!)
-else
-	docker run --name kans-elixir-lv \
-		--mount=type=bind,source=/etc/tls,target=/etc/tls,ro \
-		--mount=type=bind,source=/etc/ssl/certs/ca.crt,target=/etc/ssl/certs/ca.crt,ro \
-		--publish $(port):$(port) \
-		--label kans.source_revision=$(source_rev) \
-		--network kans-net \
-		kans-elixir-lv:$(source_rev)
-endif
-
-postgres: ## Start a postgres server instance on a container (docker)
-	docker run --name postgres \
-		-e POSTGRES_PASSWORD=ci_dev -e POSTGRES_USER=ci_dev -e POSTGRES_DB=kans_$(MIX_ENV) \
-		--network=kans-net \
-		--detach postgres
-
-postgres_ci_testing: ## Start a postgres server instance for CI testing on a container (docker)
-	docker run --name postgres-ci-testing \
-		-e POSTGRES_PASSWORD=ci_test -e POSTGRES_USER=ci_test -e POSTGRES_DB=kans_$(MIX_ENV) \
-		--network=kans-net \
-		--detach postgres
-
-network_create: ## Create a network (docker)
-	docker network create \
-		--driver=bridge \
-		--subnet=172.28.0.0/16 \
-		--ip-range=172.28.5.0/30 \
-		--gateway=172.28.5.254 \
-		kans-net
-
-network_connect: ## Connect containers to the network (docker)
-	@docker network connect kans-net postgres | true
-	@docker network connect kans-net postgres-ci-testing | true
-	@docker network connect kans-net kans-elixir-lv | true
-
-network_destroy: ## Delete the network (docker)
-	@docker network disconnect kans-net kans-elixir-lv | true
-	@docker network disconnect kans-net postgres | true
-	@docker network rm kans-net
-	@docker network rm kans-net
-
-container_cleanup: ## Stop and delete the containers (docker)
-	@docker stop kans-elixir-lv | true
-	@docker stop postgres || true
-	@docker stop postgres-ci-testing || true
-	@docker rm kans-elixir-lv | true
-	@docker rm postgres || true
-	@docker rm postgres-ci-testing || true
-
-image_cleanup: ## Delete the images (docker)
-	@docker image rm $(shell docker image ls --filter dangling=true --format {{.ID}}) | true
-	@docker image rm $(shell docker image ls --filter label=kans.source_revision=$(source_rev) --format {{.ID}}) | true
-#	docker image rm postgres
-
-image_build_ci_testing: ## Build an image to run tests (docker)
-ifeq ($(MIX_ENV), test)
-	docker build \
-		--label kans.source_revision=$(source_rev) \
-		--tag kans-elixir-lv:$(source_rev) \
-		--file Dockerfile.alpine.test \
-		.
-else
-	$(error Expected MIX_ENV to be 'test'!)
-endif
-
-container_run_ci_testing: ## Run tests on a container (docker)
-ifeq ($(MIX_ENV), test)
-	docker run --rm --name kans-elixir-lv \
-		--label kans.source_revision=$(source_rev) \
-		--network=kans-net \
-		kans-elixir-lv:$(source_rev)
-else
-	$(error Expected MIX_ENV to be 'test'!)
-endif
+minikube_start: ## Start a K8s cluster with Minikube
+	minikube start -p minikube-kans-cluster --cpus=4 --disk-size=40gb --memory=8gb
