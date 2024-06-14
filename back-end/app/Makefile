@@ -24,23 +24,32 @@ source_rev := $(shell tr -d '\n' <./VERSION)
 export
 
 install: ## Run the initial setup; i.e, install mix dependencies, etc... *(local)
-	mix local.hex --force
-	mix deps.get
-	mix deps.compile
-	mix compile
+	MIX_ENV=$(MIX_ENV) mix "do" \
+		local.hex --force
+		+ deps.get \
+		+ deps.compile \
+		+ compile
 
-release_gen: ## Generate release files
-	mix phx.gen.release
+release_init: ## Generate rel/ VM.args and env
+	MIX_ENV=$(MIX_ENV) mix release.init
+
+phx_release_gen: ## Generate release files
+	MIX_ENV=$(MIX_ENV) mix "do" \
+		deps.get \
+		+ phx.gen.release
+
+release: ## Make a release
 
 server: ## Start the web server *(local)
-	mix phx.server
+	MIX_ENV=$(MIX_ENV) mix phx.server
 
 ecto_setup: ## Set up database with Ecto and run mix ecto.{create,migrate} *(local)
 	createuser ci_dev
 	createdb kans_dev --owner=ci_dev --username=ci_dev
 	pg_ctl start
-	mix ecto.create
-	mix ecto.migrate
+	MIX_ENV=$(MIX_ENV) mix "do" \
+		ecto.create \
+		+ ecto.migrate
 
 testing: ## Run tests *(local)
 ifeq ($(MIX_ENV), test)
@@ -64,6 +73,7 @@ else
 		--label kans.source_revision=$(source_rev) \
 		--tag kans-elixir-lv-$(MIX_ENV):$(source_rev) \
 		--file Dockerfile.alpine \
+		--progress=plain \
 		.
 endif
 
@@ -96,7 +106,7 @@ network_create: ## Create a network (docker)
 	docker network create \
 		--driver=bridge \
 		--subnet=172.28.0.0/16 \
-		--ip-range=172.28.5.0/30 \
+		--ip-range=172.28.5.0/29 \
 		--gateway=172.28.5.254 \
 		kans-net
 

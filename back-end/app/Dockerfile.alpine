@@ -10,47 +10,39 @@ RUN \
 
 WORKDIR /app
 
-  #--mount=type=bind,source=mix.lock,target=mix.lock \
 RUN \
+  --mount=type=bind,source=mix.lock,target=mix.lock \
   --mount=type=cache,target=/root/.mix \
   --mount=type=cache,target=/root/.hex \
   --mount=type=bind,source=mix.exs,target=mix.exs \
   --mount=type=bind,source=config/config.exs,target=config/config.exs \
   --mount=type=bind,source=config/${MIX_ENV}.exs,target=config/${MIX_ENV}.exs \
+  --mount=type=bind,source=config/runtime.exs,target=config/runtime.exs \
   --mount=type=bind,source=VERSION,target=VERSION \
   --mount=type=bind,source=lib,target=lib \
-  --mount=type=bind,source=config/runtime.exs,target=config/runtime.exs \
   --mount=type=bind,source=assets,target=assets,rw \
+  --mount=type=bind,source=priv,target=priv,rw \
+  --mount=type=bind,source=rel,target=rel,rw \
+  mix "do" \
+    local.hex --if-missing --force \
+    + local.rebar --if-missing --force && \
+  # mix archive.install github hexpm/hex branch latest && \
+  mix deps.get --only ${MIX_ENV} && \
   MIX_ENV=${MIX_ENV} mix "do" \
-  archive.install github hexpm/hex branch latest \
-  + deps.get + deps.compile \
-  + compile \
-  + assets.setup + assets.build + assets.deploy \
-  + release --path /kans_release
-
-COPY priv priv
-
-COPY assets assets
-
-COPY rel rel
-
-COPY mix.exs .
-COPY VERSION .
-COPY lib lib
-COPY config/config.exs config/
-COPY config/${MIX_ENV}.exs ./config/
-COPY config/runtime.exs ./config/
+    deps.compile \
+    + compile \
+    + assets.setup + assets.build + assets.deploy \
+    + phx.gen.release \
+    + release --path /kans_release
 
 FROM build as release
 
-COPY --from=build --chown=10000:10000 /app /app
 COPY --from=build --chown=10000:10000 /kans_release /
-
-WORKDIR /app
 
 USER 10000:10000
 
 ENV PHX_HOST="jpat.test"
 ENV PHX_SERVER=true
 
+## to-do: migrate database schema
 CMD ["/bin/kans", "start"]

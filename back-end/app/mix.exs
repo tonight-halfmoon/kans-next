@@ -1,10 +1,12 @@
 defmodule Kans.MixProject do
   use Mix.Project
 
+  @version String.trim(File.read!("./VERSION"))
+
   def project do
     [
       app: :kans,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.16.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
