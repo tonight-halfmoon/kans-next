@@ -47,8 +47,8 @@ server: ## Start the web server *(local)
 	MIX_ENV=$(MIX_ENV) mix phx.server
 
 ecto_setup: ## Set up database with Ecto and run mix ecto.{create,migrate} *(local)
-	createuser ci_dev
-	createdb kans_dev --owner=ci_dev --username=ci_dev
+	createuser ci_$(MIX_ENV)
+	createdb kans_$(MIX_ENV) --owner=ci_$(MIX_ENV) --username=ci_$(MIX_ENV)
 	pg_ctl start
 	MIX_ENV=$(MIX_ENV) mix "do" \
 		ecto.create \
