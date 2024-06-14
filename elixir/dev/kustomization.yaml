@@ -6,5 +6,5 @@ resources:
 namePrefix: dev-
 namespace: kans-elixir-dev
 images:
-  - name: back-end-elixir
+  - name: jpat-elixir
     newTag: 0.1.0

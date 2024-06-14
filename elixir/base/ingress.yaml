@@ -3,14 +3,19 @@ kind: Ingress
 metadata:
   annotations:
     kubernetes.io/ingress.allow-http: "false"
-    nginx.ingress.kubernetes.io/rewrite-target: /health
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+    nginx.org/ssl-services: nodeport
   labels:
     app.kubernetes.io/part-of: jpat
-  name: back-end-ingress-healthz
+  name: jpat-ingress
 spec:
+  tls:
+    - hosts:
+        - jpat.test
+      secretName: tls-secret
   ingressClassName: nginx
   rules:
     - host: jpat.test
@@ -20,10 +25,6 @@ spec:
               service:
                 name: nodeport
                 port:
-                  number: 8082
-            path: /healthz
-            pathType: Exact
-  tls:
-    - secretName: tls-secret
-      hosts:
-        - jpat.test
+                  number: 4009
+            path: /
+            pathType: Prefix
