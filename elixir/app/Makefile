@@ -23,22 +23,25 @@ source_rev := $(shell tr -d '\n' <./VERSION)
 
 export
 
-install: ## Run the initial setup; i.e, install mix dependencies, etc... *(local)
+install: ## Install hex, rebar and app dependencies
 	MIX_ENV=$(MIX_ENV) mix "do" \
-		local.hex --force
-		+ deps.get \
-		+ deps.compile \
-		+ compile
+		local.hex --force --if-missing \
+		+ local.rebar --force --if-missing
+	mix deps.get --only $(MIX_ENV)
 
 release_init: ## Generate rel/ VM.args and env
 	MIX_ENV=$(MIX_ENV) mix release.init
 
-phx_release_gen: ## Generate release files
+compile: ## Compile deps and your source code
 	MIX_ENV=$(MIX_ENV) mix "do" \
-		deps.get \
-		+ phx.gen.release
+		+ deps.compile \
+		+ compile
 
-release: ## Make a release
+release: ## Make the Phoenix app release
+	MIX_ENV=$(MIX_ENV) mix "do" \
+		assets.setup + assets.build + assets.deploy \
+		+ phx.gen.release \
+		+ release
 
 server: ## Start the web server *(local)
 	MIX_ENV=$(MIX_ENV) mix phx.server

@@ -23,7 +23,7 @@ RUN \
   --mount=type=bind,source=assets,target=assets,rw \
   --mount=type=bind,source=priv,target=priv,rw \
   --mount=type=bind,source=rel,target=rel,rw \
-  mix "do" \
+  MIX_ENV=${MIX_ENV} mix "do" \
     local.hex --if-missing --force \
     + local.rebar --if-missing --force && \
   # mix archive.install github hexpm/hex branch latest && \

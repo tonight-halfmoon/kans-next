@@ -38,3 +38,7 @@ Ready to run in production? Please
 
 # WORKDIR /app
 ```
+
+## How this app is generated
+
+<!--@include:./operations-manual/installation.md-->
