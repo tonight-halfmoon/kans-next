@@ -42,3 +42,9 @@ make deploy
 ```shell
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
+
+### CLI Login
+
+```shell
+argocd login 127.0.0.1:8080
+```

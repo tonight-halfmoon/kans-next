@@ -1,7 +1,7 @@
 - op: replace
   path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-tls-secret
-  value: "kans-elixir-dev/kans-elixir-dev-ca-secret"
+  value: "kans-elixir-dev/jpat-dev-ca-secret"
 
 - op: add
   path: /metadata/annotations/nginx.org~1ssl-services
-  value: kans-elixir-dev-nodeport
+  value: jpat-dev-nodeport
