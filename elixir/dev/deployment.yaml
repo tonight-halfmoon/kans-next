@@ -4,4 +4,4 @@
 
 - op: replace
   path: /spec/template/spec/containers/0/image
-  value: jpat-elixir:0.1.0
+  value: elixir-dev:0.1.0

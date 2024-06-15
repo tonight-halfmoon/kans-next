@@ -19,4 +19,14 @@ deploy_monitoring_installation: ## Monitoring installation
 		prometheus-community/kube-prometheus-stack
 
 minikube_start: ## Start a K8s cluster with Minikube
-	minikube start -p minikube-kans-cluster --cpus=4 --disk-size=40gb --memory=8gb
+	minikube start --cpus=4 --disk-size=40gb --memory=8gb
+
+build_image: ## Build image for app
+	docker build \
+		--build-arg parameter_mix_env=$(environment) \
+		--label source_revision=$(source_revision) \
+		--label app_name=$(app) \
+		--tag $(app)-$(environment):$(source_revision) \
+		--file ./$(app)/app/Dockerfile.alpine \
+		./$(app)/app
+	minikube image load $(app)-$(environment):$(source_revision)

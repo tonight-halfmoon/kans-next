@@ -3,8 +3,17 @@ kind: Kustomization
 resources:
   - ../base
   - namespace.yaml
+
+patches:
+  - path: deployment.yaml
+    target:
+      group: apps
+      version: v1
+      kind: Deployment
+transformers:
+  - label-app-version.yaml
 namePrefix: dev-
 namespace: kans-elixir-dev
-images:
-  - name: jpat-elixir
-    newTag: 0.1.0
+# images:
+#   - name: elixir-dev
+#     newTag: 0.1.0
