@@ -30,3 +30,6 @@ build_image: ## Build image for app
 		--file ./$(app)/app/Dockerfile.alpine \
 		./$(app)/app
 	minikube image load $(app)-$(environment):$(source_revision)
+
+argocd_bootstrap:
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
