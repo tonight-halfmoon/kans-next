@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jpat
+  name: kans
   labels:
     app.kubernetes.io/part-of: jpat
 spec:
