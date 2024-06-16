@@ -1,5 +1,5 @@
 defmodule KansWeb.EndpointActuator do
   use Phoenix.Endpoint, otp_app: :kans
 
-  plug KansWeb.Plugs.Actuator
+  plug KansWeb.RouterActuator
 end
