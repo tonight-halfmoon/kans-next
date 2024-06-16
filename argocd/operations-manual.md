@@ -12,6 +12,8 @@ make --directory=./argocd
 
 ## Bug Fix
 
+### trouble decrypting
+
 The K8s `argocd-repo-server` is not able to decrypt a sops-encrypted secret
 with `age` keys
 
@@ -46,4 +48,15 @@ necessary key value. It is actually a directory!
 ```shell
 argocd@argocd-repo-server-123:~$ test -d /.config/sops/age/keys.txt && echo yes
 yes
+```
+
+### InvalidSpecError: destination server and `namespace` do not match
+
+```text
+Unable to create application: application spec for kans-elixir-dev is
+invalid: InvalidSpecError: application repo
+git@github.com:tonight-halfmoon/kans-next.git is not permitted in
+project 'jpat';InvalidSpecError: application destination server
+'https://kubernetes.default.svc' and namespace 'kans-elixir-dev' do
+not match any of the allowed destinations in project 'jpat'
 ```

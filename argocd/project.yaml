@@ -5,7 +5,7 @@ metadata:
     argocd.argoproj-labs.io/default-dest-server: https://kubernetes.default.svc
     argocd.argoproj.io/sync-options: PruneLast=true
     argocd.argoproj.io/sync-wave: "-2"
-  name: kans-next
+  name: jpat
   namespace: argocd
 spec:
   clusterResourceWhitelist:
