@@ -20,8 +20,11 @@ build_image: ## Build a docker image for an application and load it to the curre
 		./$(app)/app
 	minikube image load $(app)-$(environment):$(source_revision)
 
-deploy: ## Kustomize Build with plugins enabled and pipe to kubectl apply
-	kustomize build --enable-alpha-plugins --enable-exec $(repo_root_dir) | kubectl apply --filename -
+deploy_services: ## Kustomize Build with root Kustomization.yaml with plugins enabled and pipe to kubectl apply
+	kustomize build --enable-alpha-plugins --enable-exec  | kubectl apply --filename -
+
+deploy_app: ## Kustomize Build a particular app/environment with plugins enabled and pipe to kubectl apply; Command Line Argument example: app=elixir env=dev
+	kustomize build --enable-alpha-plugins --enable-exec .$(repo_root_dir)/$(app)/overlays/$(env) | kubectl apply --filename -
 
 deploy_monitoring_installation: ## Monitoring installation
 	helm repo add prometheus-community \

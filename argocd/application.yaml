@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kans-dev
+  name: kans-elixir-dev
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -10,7 +10,7 @@ spec:
     namespace: kans-elixir-dev
     server: "https://kubernetes.default.svc"
   source:
-    path: elixir/
+    path: elixir/overlays/dev
     repoURL: "git@github.com:tonight-halfmoon/kans-next.git"
     targetRevision: HEAD
   sources: []

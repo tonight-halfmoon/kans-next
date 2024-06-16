@@ -1,8 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../base
   - namespace.yaml
+  - ../../base
 
 patches:
   - path: deployment.yaml
@@ -12,7 +12,7 @@ patches:
       kind: Deployment
 transformers:
   - label-app-version.yaml
-namePrefix: dev-
+namePrefix: jpat-dev-
 namespace: kans-elixir-dev
 # images:
 #   - name: elixir-dev
