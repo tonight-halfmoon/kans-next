@@ -74,9 +74,11 @@ else
 	docker build \
 		--build-arg parameter_mix_env=$(MIX_ENV) \
 		--label kans.source_revision=$(source_rev) \
-		--tag kans-elixir-lv-$(MIX_ENV):$(source_rev) \
+		--label kans.environment=$(MIX_ENV) \
+		--label kans.app_name=$(app) \
+		--tag elixir-$(MIX_ENV):$(source_rev) \
+		--progress plain \
 		--file Dockerfile.alpine \
-		--progress=plain \
 		.
 endif
 
@@ -84,13 +86,14 @@ container_run: ## Start the server on a container (docker)
 ifeq ($(MIX_ENV), test)
 	$(error We do not run a server during test!)
 else
-	docker run --name kans-elixir-lv-$(MIX_ENV) \
+	docker run --name elixir-$(MIX_ENV) \
 		--mount=type=bind,source=/etc/tls,target=/etc/tls,ro \
 		--mount=type=bind,source=/etc/ssl/certs/ca.crt,target=/etc/ssl/certs/ca.crt,ro \
 		--publish $(port):$(port) \
 		--label kans.source_revision=$(source_rev) \
 		--network kans-net \
-		kans-elixir-lv-$(MIX_ENV):$(source_rev)
+		--detach \
+		elixir-$(MIX_ENV):$(source_rev)
 endif
 
 postgres: ## Start a postgres server instance on a container (docker)
@@ -116,19 +119,19 @@ network_create: ## Create a network (docker)
 network_connect: ## Connect containers to the network (docker)
 	@docker network connect kans-net postgres | true
 	@docker network connect kans-net postgres-ci-testing | true
-	@docker network connect kans-net kans-elixir-lv-$(MIX_ENV) | true
+	@docker network connect kans-net elixir-$(MIX_ENV) | true
 
 network_destroy: ## Delete the network (docker)
-	@docker network disconnect kans-net kans-elixir-lv | true
+	@docker network disconnect kans-net elixir | true
 	@docker network disconnect kans-net postgres | true
 	@docker network rm kans-net
 	@docker network rm kans-net
 
 container_cleanup: ## Stop and delete the containers (docker)
-	@docker stop kans-elixir-lv | true
+	@docker stop elixir | true
 	@docker stop postgres || true
 	@docker stop postgres-ci-testing || true
-	@docker rm kans-elixir-lv | true
+	@docker rm elixir | true
 	@docker rm postgres || true
 	@docker rm postgres-ci-testing || true
 
@@ -141,7 +144,7 @@ image_build_ci_testing: ## Build an image to run tests (docker)
 ifeq ($(MIX_ENV), test)
 	docker build \
 		--label kans.source_revision=$(source_rev) \
-		--tag kans-elixir-lv-$(MIX_ENV):$(source_rev) \
+		--tag elixir-$(MIX_ENV):$(source_rev) \
 		--file Dockerfile.alpine.test \
 		.
 else
@@ -150,10 +153,10 @@ endif
 
 container_run_ci_testing: ## Run tests on a container (docker)
 ifeq ($(MIX_ENV), test)
-	docker run --rm --name kans-elixir-lv-$(MIX_ENV) \
+	docker run --rm --name elixir-$(MIX_ENV) \
 		--label kans.source_revision=$(source_rev) \
 		--network=kans-net \
-		kans-elixir-lv-$(MIX_ENV):$(source_rev)
+		elixir-$(MIX_ENV):$(source_rev)
 else
 	$(error Expected MIX_ENV to be 'test'!)
 endif

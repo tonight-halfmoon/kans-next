@@ -10,12 +10,13 @@ export
 minikube_start: ## Start a K8s cluster with Minikube
 	minikube start --cpus=4 --disk-size=40gb --memory=8gb
 
-build_image: ## Build a docker image for an application and load it to the current profile of Minikube K8s cluster
+build_image_and_minikube_load: ## Build a docker image for an application and load it to the current profile of Minikube K8s cluster; Command Line Argument example: app=elixir environment=dev source_revision="$(tr -d '\n'<./elixir/app/VERSION)"
 	docker build \
 		--build-arg parameter_mix_env=$(environment) \
-		--label source_revision=$(source_revision) \
-		--label app_name=$(app) \
+		--label kans.source_revision=$(source_revision) \
+		--label kans.app_name=$(app) \
 		--tag $(app)-$(environment):$(source_revision) \
+		--progress plain \
 		--file ./$(app)/app/Dockerfile.alpine \
 		./$(app)/app
 	minikube image load $(app)-$(environment):$(source_revision)
