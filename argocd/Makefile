@@ -18,10 +18,12 @@ argocd_restart_server: ## ArgoCD restart the K8s deployment `argocd-server` and 
 	kubectl --namespace argocd rollout restart deployment argocd-server
 	kubectl --namespace argocd rollout status deployment argocd-server
 
+argocd_restart_repo_server: ## ArgoCD restart the K8s deployment `argocd-repo-server` and watch the status
+	kubectl --namespace argocd rollout restart deployment argocd-repo-server
+	kubectl --namespace argocd rollout status deployment argocd-repo-server
+
 argocd_port_forward: ## Run a port-forward against the K8s service `argocd-server`; Client can check `127.0.0.1:8080`
 	kubectl --namespace argocd port-forward svc/argocd-server 8080:80 &
 
-age_sops: ## Generate `age` Keys and deploy a K8s secret `sops-age`
-	age-keygen -o /tmp/age.keys.txt
-	cat /tmp/age.keys.txt | tr -d '\n' | kubectl create secret generic sops-age --namespace argocd --from-file keys.text=/dev/stdin
-	mkdir -p $(Home)/.config/sops/age && mv /tmp/age.keys.txt $(Home)/.config/sops/age/keys.txt
+generate_sops_age_secret: ## Generate `age` Keys and deploy a K8s secret `sops-age`
+	./opt/sops-age-secret-gen.bash

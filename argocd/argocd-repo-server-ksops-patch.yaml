@@ -6,11 +6,6 @@ metadata:
 spec:
   template:
     spec:
-      volumes:
-        - name: custom-tools
-          emptyDir: {}
-        - name: sops-age
-          secret:
       initContainers:
         - name: install-ksops
           image: viaductoss/ksops:v4.3.1
@@ -25,6 +20,7 @@ spec:
               name: custom-tools
       containers:
         - name: argocd-repo-server
+          imagePullPolicy: IfNotPresent
           env:
             - name: XDG_CONFIG_HOME
               value: /.config
@@ -37,6 +33,11 @@ spec:
             - mountPath: /usr/local/bin/ksops
               name: custom-tools
               subPath: ksops
-            - mountPath: /.config/sops/age/keys.txt
+            - mountPath: /.config/sops/age
               name: sops-age
-              subPath: keys.txt
+      volumes:
+        - name: custom-tools
+          emptyDir: {}
+        - name: sops-age
+          secret:
+            secretName: sops-age
