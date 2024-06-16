@@ -30,3 +30,9 @@ deploy_monitoring_installation: ## Monitoring installation
 		-f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/samples/monitoring/kube-stack-config.yaml \
 		prometheus-community \
 		prometheus-community/kube-prometheus-stack
+
+gen_sops_encrypted_tls_secret: ## Generate encrypted `TLS` K8s secret for app; Command Line Argument example: pem=tls.crt pem_key=tls.key app=elixir
+	.$(repo_root_dir)/opt/tls-encrypt.bash gen_sops_encrypted_tls_secret $(pem) $(pem_key) $(app)
+
+gen_sops_encrypted_ca_secret: ## Generate encrypted CA K8s secret for app; Command Line Argument example: ca_pem=ca.crt app=elixir
+	.$(repo_root_dir)/opt/tls-encrypt.bash gen_sops_encrypted_ca_secret $(ca_pem) $(app)
