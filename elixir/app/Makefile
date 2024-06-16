@@ -19,6 +19,8 @@ else
 	port := 4000
 endif
 
+port_actuator := 3001
+
 source_rev := $(shell tr -d '\n' <./VERSION)
 
 export
@@ -90,6 +92,7 @@ else
 		--mount=type=bind,source=/etc/tls,target=/etc/tls,ro \
 		--mount=type=bind,source=/etc/ssl/certs/ca.crt,target=/etc/ssl/certs/ca.crt,ro \
 		--publish $(port):$(port) \
+		--publish $(port_actuator):$(port_actuator) \
 		--label kans.source_revision=$(source_rev) \
 		--network kans-net \
 		--detach \
