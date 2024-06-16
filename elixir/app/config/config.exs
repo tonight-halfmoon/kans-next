@@ -7,6 +7,10 @@
 # General application configuration
 import Config
 
+config :kans,
+  ecto_repos: [Kans.Repo],
+  generators: [timestamp_type: :utc_datetime]
+
 config :kans, KansWeb.EndpointActuator,
   url: [host: "localhost"],
   adapter: Phoenix.Endpoint.Cowboy2Adapter,
@@ -14,10 +18,6 @@ config :kans, KansWeb.EndpointActuator,
     formats: [json: KansWeb.ErrorJSON],
     layout: false
   ]
-
-config :kans,
-  ecto_repos: [Kans.Repo],
-  generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
 config :kans, KansWeb.Endpoint,

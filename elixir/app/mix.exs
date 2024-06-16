@@ -64,8 +64,7 @@ defmodule Kans.MixProject do
       {:swoosh, "~> 1.5"},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0"},
-      {:telemetry_poller, "~> 1.0"},
-      {:testcontainers, "~> 1.8.0"}
+      {:telemetry_poller, "~> 1.0"}
     ]
   end
 

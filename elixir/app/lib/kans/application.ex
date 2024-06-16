@@ -7,14 +7,6 @@ defmodule Kans.Application do
 
   @impl true
   def start(_type, _args) do
-    if Application.get_env(:testcontainers, :enabled, false) do
-      {:ok, _container} =
-        Testcontainers.Ecto.postgres_container(
-          app: :kans,
-          database: "kans_test#{System.get_env("MIX_TEST_PARTITION")}"
-        )
-    end
-
     children = [
       KansWeb.Telemetry,
       Kans.Repo,
