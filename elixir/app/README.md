@@ -2,8 +2,8 @@
 
 To start your Phoenix server:
 
-  - Run `mix setup` to install and setup dependencies
-  - Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+- Run `mix setup` to install and setup dependencies
+- Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
@@ -12,13 +12,15 @@ Ready to run in production? Please
 
 ## Learn more
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+- [Official website](https://www.phoenixframework.org/)
+- [Guides](https://hexdocs.pm/phoenix/overview.html)
+- [Docs](https://hexdocs.pm/phoenix)
+- [Forum](https://elixirforum.com/c/phoenix-forum)
+- [Source](https://github.com/phoenixframework/phoenix)
 
-## Docker image optimisation
+## Docker image optimisation in Stage 1
+
+Utilise caching
 
 ```Dockerfile
 # COPY priv priv
@@ -39,6 +41,28 @@ Ready to run in production? Please
 # WORKDIR /app
 ```
 
-## How this app is generated
+## Operations Manual
 
 <!--@include:./operations-manual/installation.md-->
+
+## Required contents of a healthy image
+
+```shell
+<<-EOT
+  set -e
+  ls /app/lib /app/assets /app/priv /app/bin /app/entrypoint.alpine.sh
+EOT
+```
+
+## Docker image optimisation - Multi-stage build
+
+Utilised two Phases as recommended by the output of `mix phx.gen.release --docker`
+to achieve up to this Git commit `61.09MB`
+
+## To-Do (Near Future)
+
+### Docker Image (Alpine)
+
+Utilise the Docker image
+`hexpm/elixir:1.16.3-erlang-26.2.5-alpine-3.20.0`, for the first stage
+of the image

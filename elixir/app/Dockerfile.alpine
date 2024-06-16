@@ -6,7 +6,7 @@ ENV MIX_ENV=${parameter_mix_env?}
 RUN \
   --mount=type=cache,target=/var/cache/apk/ \
   apk --no-cache --update-cache --force-missing-repositories upgrade && \
-  apk add --no-cache git~=2.43 inotify-tools~=4.23
+  apk add --no-cache git~=2.43
 
 WORKDIR /app
 
@@ -36,12 +36,28 @@ RUN \
     + release
 
 COPY assets assets
+COPY priv priv
 
-FROM build as release
+FROM alpine:3.20
+
+RUN \
+  --mount=type=cache,target=/var/cache/apk/ \
+  apk --no-cache --update-cache --force-missing-repositories upgrade && \
+  apk add --no-cache \
+  inotify-tools~=4.23 \
+  ncurses~=6.4 \
+  libstdc++~=13.2 \
+  openssl~=3.3
 
 WORKDIR /app
 RUN chown 10000:10000 /app
 
+ARG parameter_mix_env
+ENV MIX_ENV=${parameter_mix_env?}
+
+COPY --from=build --chown=10000:10000 /app/assets /app/assets
+COPY --from=build --chown=10000:10000 /app/deps /app/deps
+COPY --from=build --chown=10000:10000 /app/priv /app/priv
 COPY --from=build --chown=10000:10000 /app/_build/${MIX_ENV}/rel/kans ./
 
 USER 10000:10000
@@ -52,3 +68,5 @@ ENV PHX_SERVER=true
 COPY --chown=10000:10000 ./entrypoint.alpine.sh ./
 
 CMD ["/app/entrypoint.alpine.sh"]
+
+# CMD ["ls", "/app/lib", "/app/assets", "/app/priv", "/app/bin"]
