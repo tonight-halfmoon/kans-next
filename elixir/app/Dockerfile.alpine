@@ -31,18 +31,24 @@ RUN \
   MIX_ENV=${MIX_ENV} mix "do" \
     deps.compile \
     + compile \
-    + assets.setup + assets.build + assets.deploy \
+    + assets.setup + assets.build \
     + phx.gen.release \
-    + release --path /kans_release
+    + release
+
+COPY assets assets
 
 FROM build as release
 
-COPY --from=build --chown=10000:10000 /kans_release /
+WORKDIR /app
+RUN chown 10000:10000 /app
+
+COPY --from=build --chown=10000:10000 /app/_build/${MIX_ENV}/rel/kans ./
 
 USER 10000:10000
 
 ENV PHX_HOST="jpat.test"
 ENV PHX_SERVER=true
 
-## to-do: migrate database schema
-CMD ["/bin/kans", "start"]
+COPY --chown=10000:10000 ./entrypoint.alpine.sh ./
+
+CMD ["/app/entrypoint.alpine.sh"]
