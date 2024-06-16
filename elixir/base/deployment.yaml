@@ -30,12 +30,12 @@ spec:
           image: kaap:0.1.0
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4000
-              protocol: TCP
-              name: api
             - containerPort: 3001
               protocol: TCP
-              name: probe
+              name: actuator
+            - containerPort: 4001
+              protocol: TCP
+              name: api
             - containerPort: 9100
               name: http-metrics
           resources:
@@ -46,12 +46,24 @@ spec:
               memory: 64Mi
               cpu: 500m
           readinessProbe:
-            initialDelaySeconds: 30
-            periodSeconds: 15
+            initialDelaySeconds: 3
+            periodSeconds: 2
             httpGet:
-              path: /health
-              port: probe
+              path: /healthz
+              port: actuator
               scheme: HTTPS
+            timeoutSeconds: 1
+            successThreshold: 1
+          # livenessProbe:
+          #   failureThreshold: 3
+          #   httpGet:
+          #     path: /healthz?full=true
+          #     port: actuator
+          #     scheme: HTTPS
+          #   initialDelaySeconds: 3
+          #   periodSeconds: 30
+          #   successThreshold: 1
+          #   timeoutSeconds: 5
           env:
             - name: DEFAULT_PORT
               valueFrom:

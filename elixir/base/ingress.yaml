@@ -25,6 +25,6 @@ spec:
               service:
                 name: nodeport
                 port:
-                  number: 4009
+                  number: 4001
             path: /
             pathType: Prefix

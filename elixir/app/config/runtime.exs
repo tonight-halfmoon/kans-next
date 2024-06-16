@@ -18,12 +18,14 @@ import Config
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
   config :kans, KansWeb.Endpoint, server: true
+  config :kans, KansWeb.EndpointActuator, server: true
 end
 
 if config_env() == :dev do
   host = System.get_env("PHX_HOST") || "jpat.test"
+  port = String.to_integer(System.get_env("API_PORT") || "4001")
+  port_actuator = String.to_integer(System.get_env("ACTUATOR_PORT") || "3001")
   scheme = "https"
-  port = 4001
 
   certfile = "/etc/tls/tls.crt"
   keyfile = "/etc/tls/tls.key"
@@ -37,6 +39,20 @@ if config_env() == :dev do
       certfile: certfile,
       cacertfile: cacertfile,
       cipher_suite: :strong
+    ]
+
+  config :kans, KansWeb.EndpointActuator,
+    url: [
+      host: host,
+      path: "/healthz",
+      port: port_actuator,
+      scheme: scheme
+    ],
+    https: [
+      keyfile: keyfile,
+      certfile: certfile,
+      cipher_suite: :strong,
+      port: port_actuator
     ]
 end
 

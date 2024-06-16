@@ -20,7 +20,7 @@ spec:
               service:
                 name: nodeport
                 port:
-                  number: 8082
+                  number: 3001
             path: /healthz
             pathType: Exact
   tls:

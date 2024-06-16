@@ -25,6 +25,7 @@ defmodule Kans.Application do
       # Start a worker by calling: Kans.Worker.start_link(arg)
       # {Kans.Worker, arg},
       # Start to serve requests, typically the last entry
+      KansWeb.EndpointActuator,
       KansWeb.Endpoint
     ]
 

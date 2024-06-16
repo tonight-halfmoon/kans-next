@@ -8,19 +8,20 @@ metadata:
     app.kubernetes.io/part-of: jpat
   annotations:
     prometheus.io/scrape: "true"
+    service.alpha.kubernetes.io/app-protocols: '{"tcp-api":"HTTP2"}'
 spec:
   selector:
     app.kubernetes.io/name: kans
   type: NodePort
   ports:
-    - name: tcp-probe
-      port: 4009
+    - name: actuator
+      port: 3001
       protocol: TCP
-      targetPort: 3001
-    - name: tcp-api
-      port: 4002
+      targetPort: actuator
+    - name: api
+      port: 4001
       protocol: TCP
-      targetPort: 4000
+      targetPort: api
     - name: http
       port: 8080
       targetPort: http-metrics
