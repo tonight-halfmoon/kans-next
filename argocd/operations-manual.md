@@ -50,7 +50,9 @@ argocd@argocd-repo-server-123:~$ test -d /.config/sops/age/keys.txt && echo yes
 yes
 ```
 
-### InvalidSpecError: destination server and `namespace` do not match
+### InvalidSpecError
+
+Error detail: destination server and namespace do not match
 
 ```text
 Unable to create application: application spec for kans-elixir-dev is

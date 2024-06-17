@@ -11,7 +11,7 @@ argocd_install: ## Install ArgoCD (Getting Started)
 	kubectl create namespace argocd
 	kubectl apply --namespace argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-argicd_login_cli: ## Login to Local ArgoCD with the CLI
+argocd_login_cli: ## Login to Local ArgoCD with the CLI
 	argocd login 127.0.0.1:8080
 
 argocd_connect_to_this_git_repo_with_ssh_private_key: ## Setup connection against a private Git Repository with SSH private key
