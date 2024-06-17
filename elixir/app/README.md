@@ -20,7 +20,7 @@ Ready to run in production? Please
 
 ## Docker image optimisation in Stage 1
 
-Utilise caching
+Utilise mount instead of the following COPY instruction
 
 ```Dockerfile
 # COPY priv priv
@@ -40,10 +40,6 @@ Utilise caching
 
 # WORKDIR /app
 ```
-
-## Operations Manual
-
-<!--@include:./operations-manual/installation.md-->
 
 ## Required contents of a healthy image
 

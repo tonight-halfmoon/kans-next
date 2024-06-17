@@ -31,3 +31,6 @@ gen_sops_encrypted_tls_secret: ## Generate encrypted `TLS` K8s secret for app; C
 
 gen_sops_encrypted_ca_secret: ## Generate encrypted CA K8s secret for app; Command Line Argument example: ca_pem=ca.crt app=elixir
 	.$(repo_root_dir)/opt/tls-encrypt.bash gen_sops_encrypted_ca_secret $(ca_pem) $(app)
+
+codespell_check: ## Run codespell to check misspelling
+	@codespell --skip="**/cache,**/_build,**/deps,**/assets,**/priv,**/node_modules" --uri-ignore-words-list statics --exclude-file Makefile
