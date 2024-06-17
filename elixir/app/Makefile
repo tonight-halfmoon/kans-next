@@ -23,6 +23,8 @@ port_actuator := 3001
 
 source_rev := $(shell tr -d '\n' <./VERSION)
 
+git_commit_sha := $(shell git rev-parse HEAD | cut -c1-7)
+
 export
 
 install: ## Install hex, rebar and app dependencies
@@ -48,15 +50,17 @@ release: ## Make the Phoenix app release
 server: ## Start the web server *(local)
 	MIX_ENV=$(MIX_ENV) mix phx.server
 
+database_setup: ## Start a PostgreSQL instance locally with a environment-specific database and a role
+	@./opt/postgres_ensure_started
+	@createuser --role=$(USER) --superuser --createdb ci_$(MIX_ENV) || true
+	@createdb --owner=ci_$(MIX_ENV) kans_$(ENV_ENV)
+
 ecto_setup: ## Set up database with Ecto and run mix ecto.{create,migrate} *(local)
-	createuser ci_$(MIX_ENV)
-	createdb kans_$(MIX_ENV) --owner=ci_$(MIX_ENV) --username=ci_$(MIX_ENV)
-	pg_ctl start
 	MIX_ENV=$(MIX_ENV) mix "do" \
 		ecto.create \
 		+ ecto.migrate
 
-testing: ## Run tests *(local)
+run_unit_tests: ## Run tests *(local)
 ifeq ($(MIX_ENV), test)
 	MIX_ENV=$(MIX_ENV) mix "do" \
 		deps.get \
@@ -79,6 +83,7 @@ else
 		--label kans.environment=$(MIX_ENV) \
 		--label kans.app_name=$(app) \
 		--tag elixir-$(MIX_ENV):$(source_rev) \
+		--tag elixir-$(MIX_ENV):$(git_commit_sha) \
 		--progress plain \
 		--file Dockerfile.alpine \
 		.

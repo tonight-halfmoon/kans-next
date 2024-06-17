@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+PGDATA="${HOME}"/.local/var/postgres
+PGLOG="${HOME}"/.local/var/postgres-run-"${USER}".logs
+
+pg_ctl --pgdata="${PGDATA}" --log="${PGLOG}" status || {
+  pg_ctl --pgdata="${PGDATA}" --log="${PGLOG}" initdb
+  pg_ctl --pgdata="${PGDATA}" --log="${PGLOG}" start
+}
+
+exit "${?}"
