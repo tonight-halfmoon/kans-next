@@ -61,3 +61,4 @@ This is very useful for a rapid development course.
   - Maintain 85% code coverage
   - Utilise code coverage tool
 - Fix the CI GitHub Actions and Bitbucket Pipelines
+- Utilise Kustomize Components
