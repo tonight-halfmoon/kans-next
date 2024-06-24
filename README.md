@@ -4,7 +4,7 @@ Empirical minimum viable demonstration on DevOps and GitOps topics
 
 Showing the following
 
-- Kubernetes workloads is defined by the tracked Git commit of the source code (i.e., HEAD)
+- Kubernetes workload is defined by the tracked Git commit of the source code (i.e., HEAD)
 - Code yields in the next image artifact (Docker)
 - Continuous Deployment (CD) with ArgoCD
 - Continuous Integration (CI) with GitHub Actions and Bitbucket Pipelines (in-progress)
@@ -53,7 +53,7 @@ This is very useful for a rapid development course.
 - Utilise cert-manager on `letsencrypt`
 - Get a free subscription with cloud provider to provision and manage the infrastructure
   in Terraform (IaC)
-- Increment coverage ArgoCD Kubernetes deployment management in this repository
+- Complete the Kubernetes deployment management of ArgoCD
 - Remote Git repository
   - Setup branch protections and add branch rule-set
   - Register and setup GitHub App access for ArgoCD
