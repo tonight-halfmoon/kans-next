@@ -8,7 +8,7 @@ git_remote := $(shell git remote --verbose | head -n 1 | cut -d ' ' -f 1 | awk '
 export
 
 argocd_install: ## Install ArgoCD (Getting Started)
-	kubectl create namespace argocd
+	@kubectl create namespace argocd || true
 	kubectl apply --namespace argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 argocd_login_cli: ## Login to Local ArgoCD with the CLI
