@@ -20,6 +20,6 @@ transformers:
 namePrefix: jpat-dev-
 namespace: kans-elixir-dev
 images:
-  - name: app
+  - name: kaap
     newName: elixir-dev
     newTag: 0.1.0
