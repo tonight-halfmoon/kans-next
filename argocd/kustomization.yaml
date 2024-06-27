@@ -12,3 +12,6 @@ resources:
 
 patches:
   - path: argocd-repo-server-ksops-patch.yaml
+
+generators:
+  - ./secret-generator.yaml
