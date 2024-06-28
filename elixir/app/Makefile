@@ -89,7 +89,7 @@ else
 		.
 endif
 
-container_run: ## Start the server on a container (docker)
+container_run: ## Start the server on a container (docker); Usage example: make container_run POSTGRES_USERNAME=ci_dev POSTGRES_PASSWORD=ci_dev POSTGRES_DB=postgres POSTGRES_HOST=postgres
 ifeq ($(MIX_ENV), test)
 	$(error We do not run a server during test!)
 else
@@ -101,6 +101,10 @@ else
 		--label kans.source_revision=$(source_rev) \
 		--network kans-net \
 		--detach \
+		--env POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
+		--env POSTGRES_USERNAME=$(POSTGRES_USERNAME) \
+		--env POSTGRES_DB=$(POSTGRES_DB) \
+		--env POSTGRES_HOST=$(POSTGRES_HOST) \
 		elixir-$(MIX_ENV):$(source_rev)
 endif
 

@@ -1,3 +1,11 @@
 - op: replace
   path: /spec/replicas
   value: 1
+
+- op: replace
+  path: /spec/selector/matchLabels/app.kubernetes.io~1name
+  value: jpat-dev-kans
+
+- op: replace
+  path: /spec/template/metadata/labels/app.kubernetes.io~1name
+  value: jpat-dev-kans

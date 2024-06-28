@@ -5,6 +5,11 @@ resources:
   - ../../base
 
 patches:
+  - path: service.yaml
+    target:
+      kind: Service
+      version: v1
+      name: nodeport
   - path: deployment.yaml
     target:
       group: apps
@@ -22,4 +27,4 @@ namespace: kans-elixir-dev
 images:
   - name: kaap
     newName: elixir-dev
-    newTag: 0.2.0
+    newTag: 0.3.0

@@ -1,7 +1,7 @@
 apiVersion: builtin
 kind: LabelTransformer
 metadata:
-  name: elixir-dev
+  name: jpat-dev-kans
 labels:
   app.kubernetes.io/version: 0.4.21
 fieldSpecs:

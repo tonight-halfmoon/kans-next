@@ -1,0 +1,7 @@
+- op: replace
+  path: /spec/selector/app.kubernetes.io~1name
+  value: jpat-dev-kans
+
+- op: add
+  path: /metadata/labels/app.kubernetes.io~1name
+  value: jpat-dev-kans

@@ -7,17 +7,15 @@ repo_root_dir := $(CURRDIR)
 
 export
 
-minikube_start: ## Start a K8s cluster with Minikube
-	minikube start --cpus=4 --disk-size=40gb --memory=8gb
-
-load_image_into_minikube: ## load a Docker image into the current profile of Minikube; Command Line Argument example: app=elixir environment=dev source_revision="$(tr -d '\n'<./elixir/app/VERSION)"
-	minikube image load $(app)-$(environment):$(source_revision)
-
 deploy_services: ## Kustomize Build with root Kustomization.yaml with plugins enabled and pipe to kubectl apply
 	kustomize build --enable-alpha-plugins --enable-exec  | kubectl apply --filename -
 
 deploy_app: ## Kustomize Build a particular app/environment with plugins enabled and pipe to kubectl apply; Command Line Argument example: app=elixir env=dev
 	kustomize build --enable-alpha-plugins --enable-exec .$(repo_root_dir)/$(app)/overlays/$(env) | kubectl apply --filename -
+
+diff_app: ## Kustomize Build a particular app/environment with plugins enabled and pipe to kubectl diff; Command Line Argument example: app=elixir env=dev
+	kustomize build --enable-alpha-plugins --enable-exec .$(repo_root_dir)/$(app)/overlays/$(env) | kubectl diff --filename -
+
 deploy_monitoring_installation: ## Monitoring installation
 	helm repo add prometheus-community \
 		https://prometheus-community.github.io/helm-charts
