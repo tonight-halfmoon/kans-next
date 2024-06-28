@@ -21,40 +21,74 @@ if System.get_env("PHX_SERVER") do
   config :kans, KansWeb.EndpointActuator, server: true
 end
 
-if config_env() == :dev do
-  host = System.get_env("PHX_HOST") || "jpat.test"
-  port = String.to_integer(System.get_env("API_PORT") || "4001")
-  port_actuator = String.to_integer(System.get_env("ACTUATOR_PORT") || "3001")
-  scheme = "https"
+if config_env() != :test do
+  postgres_password =
+    System.get_env("POSTGRES_PASSWORD") ||
+      raise """
+      environment variable POSTGRES_PASSWORD is missing.
+      """
 
-  certfile = "/etc/tls/tls.crt"
-  keyfile = "/etc/tls/tls.key"
-  cacertfile = "/etc/ssl/certs/ca.crt"
+  postgres_username =
+    System.get_env("POSTGRES_USERNAME") ||
+      raise """
+      environment variable POSTGRES_USERNAME is missing.
+      """
 
-  config :kans, KansWeb.Endpoint,
-    url: [host: host, port: port, scheme: scheme],
-    https: [
-      port: port,
-      keyfile: keyfile,
-      certfile: certfile,
-      cacertfile: cacertfile,
-      cipher_suite: :strong
-    ]
+  postgres_database =
+    System.get_env("POSTGRES_DB") ||
+      raise """
+      environment variable POSTGRES_DB is missing.
+      """
 
-  config :kans, KansWeb.EndpointActuator,
-    url: [
-      host: host,
-      path: "/healthz",
-      port: port_actuator,
-      scheme: scheme
-    ],
-    https: [
-      keyfile: keyfile,
-      certfile: certfile,
-      cipher_suite: :strong,
-      port: port_actuator
-    ]
+  postgres_host =
+    System.get_env("POSTGRES_HOST") ||
+      raise """
+      environment variable POSTGRES_HOST is missing.
+      """
+
+  # Configure your database
+  config :kans, Kans.Repo,
+    username: postgres_username,
+    password: postgres_password,
+    hostname: postgres_host,
+    database: postgres_database,
+    stacktrace: true,
+    show_sensitive_data_on_connection_error: true,
+    pool_size: 10
 end
+
+host = System.get_env("PHX_HOST") || "jpat.test"
+port = String.to_integer(System.get_env("API_PORT") || "4001")
+port_actuator = String.to_integer(System.get_env("ACTUATOR_PORT") || "3001")
+scheme = "https"
+
+certfile = "/etc/tls/tls.crt"
+keyfile = "/etc/tls/tls.key"
+cacertfile = "/etc/ssl/certs/ca.crt"
+
+config :kans, KansWeb.Endpoint,
+  url: [host: host, port: port, scheme: scheme],
+  https: [
+    port: port,
+    keyfile: keyfile,
+    certfile: certfile,
+    cacertfile: cacertfile,
+    cipher_suite: :strong
+  ]
+
+config :kans, KansWeb.EndpointActuator,
+  url: [
+    host: host,
+    path: "/healthz",
+    port: port_actuator,
+    scheme: scheme
+  ],
+  https: [
+    keyfile: keyfile,
+    certfile: certfile,
+    cipher_suite: :strong,
+    port: port_actuator
+  ]
 
 if config_env() == :prod do
   database_url =

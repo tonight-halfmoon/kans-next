@@ -40,30 +40,27 @@ spec:
               name: http-metrics
           resources:
             requests:
-              memory: 32Mi
+              memory: 128Mi
               cpu: 250m
             limits:
-              memory: 64Mi
-              cpu: 500m
+              memory: 265Mi
           readinessProbe:
-            initialDelaySeconds: 3
-            periodSeconds: 2
+            initialDelaySeconds: 15
+            periodSeconds: 10
             httpGet:
               path: /healthz
               port: actuator
               scheme: HTTPS
-            timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz?full=true
+              port: actuator
+              scheme: HTTPS
+            initialDelaySeconds: 3
+            periodSeconds: 30
             successThreshold: 1
-          # livenessProbe:
-          #   failureThreshold: 3
-          #   httpGet:
-          #     path: /healthz?full=true
-          #     port: actuator
-          #     scheme: HTTPS
-          #   initialDelaySeconds: 3
-          #   periodSeconds: 30
-          #   successThreshold: 1
-          #   timeoutSeconds: 5
+            timeoutSeconds: 5
           env:
             - name: DEFAULT_PORT
               valueFrom:
@@ -76,6 +73,11 @@ spec:
               value: /etc/tls/tls.key
             - name: CA_CRT
               value: /etc/ssl/certs/ca.crt
+          envFrom:
+            - secretRef:
+                name: postgres-access
+            - configMapRef:
+                name: postgres-access
           volumeMounts:
             - name: tls
               mountPath: /etc/tls

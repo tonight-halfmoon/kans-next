@@ -17,11 +17,11 @@ spec:
     - name: actuator
       port: 3001
       protocol: TCP
-      targetPort: actuator
+      targetPort: 3001
     - name: api
       port: 4001
       protocol: TCP
-      targetPort: api
+      targetPort: 4001
     - name: http
       port: 8080
       targetPort: http-metrics

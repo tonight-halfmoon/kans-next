@@ -12,6 +12,11 @@ configMapGenerator:
       - ./envs/ports.envs
     options:
       disableNameSuffixHash: true
+  - name: postgres-access
+    envs:
+      - ./envs/postgres.envs
+    options:
+      disableNameSuffixHash: true
 buildMetadata:
   - originAnnotations
 generators:

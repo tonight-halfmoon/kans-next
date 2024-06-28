@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   annotations:
     kubernetes.io/ingress.allow-http: "false"
-    nginx.ingress.kubernetes.io/rewrite-target: /health
+    nginx.ingress.kubernetes.io/rewrite-target: /healthz
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
@@ -21,7 +21,7 @@ spec:
                 name: nodeport
                 port:
                   number: 3001
-            path: /healthz
+            path: /health
             pathType: Exact
   tls:
     - secretName: tls-secret
