@@ -1,0 +1,48 @@
+name: CI for the Elixir App (kans)
+
+on:
+  push:
+    branches: [$default-branch]
+  pull_request:
+    branches: [$default-branch]
+
+permissions:
+  contents: read
+
+env:
+  MIX_ENV: test
+
+jobs:
+  build:
+    name: Compile and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: 1.16.2
+          otp-version: 26.2.5
+          path: apps/elixir/app/
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-key: ${{ runner.os }}-mix-
+
+      - name: Get dependencies
+        run: |
+          mix "do" \
+            local.hex --if-missing --force \
+            + local.rebar --if-missing --force && \
+          mix deps.get --only ${MIX_ENV}
+
+      - name: Compile dependencies and source code
+        run: |
+          MIX_ENV=${MIX_ENV} mix "do" \
+            deps.compile \
+            + compile
+
+      - name: Run tests
+        run: MIX_ENV=${MIX_ENV} mix ci_testing
