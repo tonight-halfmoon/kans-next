@@ -27,4 +27,4 @@ namespace: kans-elixir-dev
 images:
   - name: kaap
     newName: elixir-dev
-    newTag: 0.3.0
+    newTag: 0.4.0

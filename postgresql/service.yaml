@@ -8,9 +8,9 @@ metadata:
   annotations:
     prometheus.io/scrape: "true"
 spec:
+  clusterIP: None
   selector:
     app.kubernetes.io/name: postgresql
-  type: NodePort
   ports:
     - name: postgres
       port: 5432

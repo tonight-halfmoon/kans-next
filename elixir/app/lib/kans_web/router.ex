@@ -14,6 +14,19 @@ defmodule KansWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :api_auth do
+    plug :accepts, ["json"]
+    plug KansWeb.Plugs.Identity
+  end
+
+  scope "/api", KansWeb do
+    scope "/v1" do
+      pipe_through :api
+      pipe_through(:api_auth)
+      get "/ping", PingController, :ping
+    end
+  end
+
   scope "/", KansWeb do
     pipe_through :browser
 

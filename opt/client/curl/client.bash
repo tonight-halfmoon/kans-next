@@ -67,6 +67,9 @@ if [ "${url_scheme}" = https ]; then
   client_key="${5:?Expected client certificate Key! $(usage)}"
   ca_crt="${6:?Expected CA .[crt|pem]! $(usage)}"
   cert_type=PEM
+  this_jwt="$("${repo_root_dir}"/opt/jwt/jwt-gen.bash s_X "${pkey}")"
+
+  printf '%s\n' "Generated a JWT token - (showing only first 4 characters): $(cut -c -4 <<<"${this_jwt}")"
 fi
 
 host="${7:-${host_name}}"
@@ -77,6 +80,7 @@ printf '%s\n' "Attempt to evaluate curl on the URL, ${url}"
 
 if [ "${url_scheme}" = https ]; then
   curl \
+    --header "Authorization: Bearer ${this_jwt}" \
     --cert "${client_crt}" \
     --key "${client_key}" \
     --cacert "${ca_crt}" \
