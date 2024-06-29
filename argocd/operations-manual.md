@@ -29,9 +29,9 @@ required, got 0unable to generate manifests: error decrypting file
 "./ca-secret.enc.yaml" from manifest.Files: trouble decrypting file:
 Error getting data key: 0 successful groups required, got 0Error:
 accumulating resources: accumulation err='accumulating resources from
-'../../base': '<path to cached source>/elixir/base' must resolve to a
+'../**/base': '<path to cached source>/**/base' must resolve to a
 file': recursed accumulation of path '<path to cached
-source>/elixir/base': couldn't execute function: exit status 1
+source>/**/base': couldn't execute function: exit status 1
 ```
 
 Assumptions:
