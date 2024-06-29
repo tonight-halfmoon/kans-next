@@ -7,11 +7,8 @@ help:
 # From the root directory of this project, evaluate the following command
 # make --directory=./opt/client/curl healthz
 
-minikube_tunnel: ## Run Minikube tunnel
-	minikube tunnel
-
 health: ## Run a cURL client against the (actuator) `health` (HTTPS Endpoint); CLAs: client_cert=/etc/tls/client.crt client_key=/etc/tls/client.key ca_cert=~/.local/tls/ca.crt
-	./client.bash https health 443 $(client_cert) $(client_key) $(ca_cert)
+	./client.bash https health $(port) $(client_cert) $(client_key) $(ca_cert)
 
-api_ping: ## Run a cURL client against the `api/v1/ping` API (HTTPS Endpoint)
-	./client.bash https api/v1/ping 443 /etc/tls/client.crt /etc/tls/client.key /etc/ssl/certs/ca.crt
+api_ping: ## Run a cURL client against the `api/v1/ping` API (HTTPS Endpoint); Usage Example: make api_ping port=4001 client_cert=/etc/tls/client.crt client_key=/etc/tls/client.key ca_cert=~/.local/tls/ca.crt
+	./client.bash https api/v1/ping $(port) $(client_cert) $(client_key) $(ca_cert)

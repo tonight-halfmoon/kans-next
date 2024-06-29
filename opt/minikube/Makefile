@@ -15,5 +15,8 @@ is_minikube_context:
 minikube_wait_for_ingress_nginx:
 	./minikube-cli-client.bash minikube_wait_for_ingress_nginx
 
-minikube_load_docker_image: ## load a Docker image into the current profile of Minikube; Command Line Argument example: app=elixir environment=dev source_revision="$(tr -d '\n'<./elixir/app/VERSION)"
+minikube_load_docker_image: ## load a Docker image into the current profile of Minikube; Command Line Argument example: app=elixir environment=dev source_revision="$(tr -d '\n'<"${repo_root_dir}"/elixir/app/VERSION)"
 	minikube image load $(app)-$(environment):$(source_revision)
+
+minikube_tunnel: ## Run Minikube tunnel
+	minikube tunnel
