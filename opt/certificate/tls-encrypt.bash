@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-set -o errexit
 set -o errtrace
 
 type kubectl >/dev/null
 type sops >/dev/null
 
 program_name="$(basename "${0}")"
-repo_root_dir="$(git -C . rev-parse --show-toplevel)"
+source_dir=$(cd "$(dirname "${0}")" && pwd)
+repo_root_dir="$(git -C "${source_dir}" rev-parse --show-toplevel)"
 
 host=jpat.test
 os_name="$(uname -s | tr '[:upper:]' '[:lower:]')"
@@ -44,11 +44,9 @@ Available functions:
 
    gen_sops_encrypted_tls_secret [parameters]
 
-   gen_sops_encrypted_tls_secret_with_ca_option [parameters]
+   gen_sops_encrypted_tls_secret_with_validate_strict [parameters]
 
    gen_sops_encrypted_ca_secret [parameters]
-
-   gen_sops_encrypted_ca_secret_along_tls [parameters]
 
 Parameters:
 
@@ -57,8 +55,8 @@ A function generates a secret contains the CA requires: 'ca_crt';
 
 Examples:
 
-  \$ ${program_name} gen_sops_encrypted_tls_secret_with_ca_option ~/.local/tls/tls.crt ~/.local/tls/tls.key ~/.local/tls/ca.crt
-  \$ ${program_name} gen_sops_encrypted_ca_secret_along_tls ~/.local/tls/ca.crt ~/.local/tls/tls.crt ~/.local/tls/tls.key
+  \$ ${program_name} gen_sops_encrypted_tls_secret ~/.local/tls/tls.crt ~/.local/tls/tls.key
+  \$ ${program_name} gen_sops_encrypted_ca_secret ~/.local/tls/ca.crt
 EOF
   )"
 
@@ -81,9 +79,8 @@ gen_sops_encrypted_tls_secret() {
   # ./opt/tls-encrypt.bash gen_sops_encrypted_tls_secret ~/.local/tls/tls.crt ~/.local/tls/tls.key
   local tls_crt="${1:?Expected Server certificate! E.g., tls.crt}"
   local tls_key="${2:?Expected Server certificate key! E.g., tls.key}"
-  local app="${3:?Expected Application name!}"
 
-  local base_dir="${repo_root_dir}"/"${app}"/base
+  local base_dir="${repo_root_dir}"/kp15s/base
 
   printf '%s\n' "${letter}"
   printf '%s\n' "Attempt to make an encrypted k8s TLS secret..."
@@ -98,21 +95,19 @@ gen_sops_encrypted_tls_secret() {
   return "${?}"
 }
 
-gen_sops_encrypted_tls_secret_with_supplying_ca_option() {
+gen_sops_encrypted_tls_secret_with_validate_strict() {
   local tls_crt="${1:?Expected Server certificate! E.g., tls.crt}"
   local tls_key="${2:?Expected Server certificate key! E.g., tls.key}"
-  local ca_crt="${3:?Expected CA Certificate Authority! E.g., ca.crt}"
-  local app="${4:?Expected Application name!}"
 
-  local base_dir="${repo_root_dir}"/"${app}"/base
+  local base_dir="${repo_root_dir}"/kp15s/base
 
   printf '%s\n' "${letter}"
   printf '%s\n' " Attempt to make an encrypted k8s TLS secret, with specifying the CA..."
 
   kubectl create secret tls tls-secret \
-    --certificate-authority "${ca_crt}" \
     --cert "${tls_crt}" \
     --key "${tls_key}" \
+    --validate=strict \
     --dry-run=client \
     --output yaml >"${temp_dir}"/tls-secret.yaml &&
     sops --encrypt "${temp_dir}"/tls-secret.yaml >"${base_dir}"/tls-secret.enc.yaml
@@ -124,9 +119,8 @@ gen_sops_encrypted_ca_secret() {
   # Usage Example
   # ./opt/tls-encrypt.bash gen_sops_encrypted_ca_secret ~/.local/tls/ca.crt
   local ca_crt="${1:?Expected CA certificate! E.g., ca.crt}"
-  local app="${2:?Expected Application name!}"
 
-  local base_dir="${repo_root_dir}"/"${app}"/base
+  local base_dir="${repo_root_dir}"/kp15s/base
 
   printf '%s\n' "${letter}"
   printf '%s\n' "Attempt to make an encrypted k8s Generic secret for the CA..."
@@ -137,29 +131,6 @@ gen_sops_encrypted_ca_secret() {
     --dry-run=client \
     --output yaml >"${temp_dir}"/ca-secret.yaml &&
     sops --encrypt "${temp_dir}"/ca-secret.yaml >"${base_dir}"/ca-secret.enc.yaml
-
-  return "${?}"
-}
-
-gen_sops_encrypted_mutual_tls_secret_along_ca() {
-  local ca_crt="${1:?Expected CA certificate! E.g., ca.crt}"
-  local tls_crt="${2:?Expected Server certificate! E.g., tls.crt}"
-  local tls_key="${3:?Expected Server certificate key! E.g., tls.key}"
-  local app="${4:?Expected Application name!}"
-
-  local base_dir="${repo_root_dir}"/"${app}"/base
-
-  printf '%s\n' "${letter}"
-  printf '%s\n' "Attempt to make an encrypted k8s Generic secret for the CA along with the TLS for both TLS and Client Authorisation..."
-
-  kubectl create secret generic tls-secret \
-    --from-file "${tls_crt}" \
-    --from-file "${tls_key}" \
-    --from-file "${ca_crt}" \
-    --type=Opaque \
-    --dry-run=client \
-    --output yaml >"${temp_dir}"/tls-secret.yaml &&
-    sops --encrypt "${temp_dir}"/tls-secret.yaml >"${base_dir}"/tls-secret.enc.yaml
 
   return "${?}"
 }
