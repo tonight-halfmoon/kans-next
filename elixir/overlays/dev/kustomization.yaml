@@ -1,29 +1,19 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+namespace: kans-elixir-dev
+
 resources:
-  - namespace.yaml
-  - ../../../kp15s/base
+  - ./namespace.yaml
+  - ../../../kp15s/overlays/dev
 
 patches:
-  - path: service.yaml
-    target:
-      kind: Service
-      version: v1
-      name: nodeport
-  - path: deployment.yaml
-    target:
-      group: apps
-      version: v1
-      kind: Deployment
   - path: ingress.yaml
     target:
       group: networking.k8s.io
       kind: Ingress
       version: v1
-transformers:
-  - label-app-version.yaml
-namePrefix: jpat-dev-
-namespace: kans-elixir-dev
+
 images:
   - name: kaap
     newName: elixir-dev
