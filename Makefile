@@ -24,11 +24,14 @@ deploy_monitoring_installation: ## Monitoring installation
 		prometheus-community \
 		prometheus-community/kube-prometheus-stack
 
-gen_sops_encrypted_tls_secret: ## Generate encrypted `TLS` K8s secret for app; Command Line Argument example: pem=tls.crt pem_key=tls.key app=elixir
-	.$(repo_root_dir)/opt/tls-encrypt.bash gen_sops_encrypted_tls_secret $(pem) $(pem_key) $(app)
+gen_tls_certificate_for_host: ## Generate A TLS certificate for the HOST; pass host name, e.g., host=jpat.io; Pass CA cert and key if available
+	.$(repo_root_dir)/opt/certificate/tls-gen-$(host) $(ca_cert) $(ca_key)
 
-gen_sops_encrypted_ca_secret: ## Generate encrypted CA K8s secret for app; Command Line Argument example: ca_pem=ca.crt app=elixir
-	.$(repo_root_dir)/opt/tls-encrypt.bash gen_sops_encrypted_ca_secret $(ca_pem) $(app)
+gen_sops_encrypted_tls_secret: ## Generate an encrypted `TLS` K8s secret manifest; Command Line Argument example: pem=tls.crt pem_key=tls.key
+	.$(repo_root_dir)/opt/certificate/tls-encrypt.bash gen_sops_encrypted_tls_secret_with_validate_strict $(pem) $(pem_key)
+
+gen_sops_encrypted_ca_secret: ## Generate an encrypted CA K8s secret manifest; Command Line Argument example: ca_pem=ca.crt
+	.$(repo_root_dir)/opt/certificate/tls-encrypt.bash gen_sops_encrypted_ca_secret $(ca_pem) $(app)
 
 codespell_check: ## Run codespell to check misspelling
 	@codespell --skip="**/cache,**/_build,**/deps,**/assets,**/priv,**/node_modules" --uri-ignore-words-list statics --exclude-file Makefile
