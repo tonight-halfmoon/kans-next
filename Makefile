@@ -35,3 +35,7 @@ gen_sops_encrypted_ca_secret: ## Generate an encrypted CA K8s secret manifest; C
 
 codespell_check: ## Run codespell to check misspelling
 	@codespell --skip="**/cache,**/_build,**/deps,**/assets,**/priv,**/node_modules" --uri-ignore-words-list statics --exclude-file Makefile
+
+act: ## Run `act` (GitHub Actions Run Locally); Utilise either act --pull=false or act --action-offline-mode
+	type gh
+	act --action-offline-mode --secret GITHUB_TOKEN=.$(gh auth token)
