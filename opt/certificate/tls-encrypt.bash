@@ -9,6 +9,8 @@ program_name="$(basename "${0}")"
 source_dir=$(cd "$(dirname "${0}")" && pwd)
 repo_root_dir="$(git -C "${source_dir}" rev-parse --show-toplevel)"
 
+base_dir="${repo_root_dir}"/kp15s/base
+
 host=jpat.test
 os_name="$(uname -s | tr '[:upper:]' '[:lower:]')"
 xss="$(if [[ "${os_name}" = *linux* ]]; then echo ".XXXXXX"; else echo ""; fi)"
@@ -80,8 +82,6 @@ gen_sops_encrypted_tls_secret() {
   local tls_crt="${1:?Expected Server certificate! E.g., tls.crt}"
   local tls_key="${2:?Expected Server certificate key! E.g., tls.key}"
 
-  local base_dir="${repo_root_dir}"/kp15s/base
-
   printf '%s\n' "${letter}"
   printf '%s\n' "Attempt to make an encrypted k8s TLS secret..."
 
@@ -98,8 +98,6 @@ gen_sops_encrypted_tls_secret() {
 gen_sops_encrypted_tls_secret_with_validate_strict() {
   local tls_crt="${1:?Expected Server certificate! E.g., tls.crt}"
   local tls_key="${2:?Expected Server certificate key! E.g., tls.key}"
-
-  local base_dir="${repo_root_dir}"/kp15s/base
 
   printf '%s\n' "${letter}"
   printf '%s\n' " Attempt to make an encrypted k8s TLS secret, with specifying the CA..."
@@ -119,8 +117,6 @@ gen_sops_encrypted_ca_secret() {
   # Usage Example
   # ./opt/tls-encrypt.bash gen_sops_encrypted_ca_secret ~/.local/tls/ca.crt
   local ca_crt="${1:?Expected CA certificate! E.g., ca.crt}"
-
-  local base_dir="${repo_root_dir}"/kp15s/base
 
   printf '%s\n' "${letter}"
   printf '%s\n' "Attempt to make an encrypted k8s Generic secret for the CA..."

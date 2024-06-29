@@ -7,7 +7,7 @@
 In the root directory, one may run ArgoCD Makefile tasks as follows.
 
 ```shell
-make --directory=./argocd
+make --directory=./kp15s/argocd
 ```
 
 ## Bug Fix

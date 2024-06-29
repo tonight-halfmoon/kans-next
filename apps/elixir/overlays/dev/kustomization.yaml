@@ -5,7 +5,7 @@ namespace: kans-elixir-dev
 
 resources:
   - ./namespace.yaml
-  - ../../../kp15s/overlays/dev
+  - ../../../../kp15s/overlays/dev
 
 patches:
   - path: ingress.yaml
@@ -20,4 +20,4 @@ images:
     newTag: 0.4.0
 
 components:
-  - ../../../components/postgres
+  - ../../../../kp15s/components/postgres
