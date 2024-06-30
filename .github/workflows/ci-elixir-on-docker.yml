@@ -1,0 +1,82 @@
+name: CI for Elixir App on Dockerfile.alpine.test
+
+on:
+  push:
+    paths-ignore: ["**.md"]
+    branches:
+      - "main"
+      - "feature/*"
+      - "release/*"
+      - "pre-release/*"
+  pull_request:
+    paths-ignore: ["**.md"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  image_tag: elixir-act-pipeline:this
+  Elixir_version: 1.16.2
+  MIX_ENV: test
+  postgres_version: 16.3
+
+services:
+  ## Reference: [s](https://docs.github.com/en/actions
+  ##                  /using-containerized-services/creating-postgresql-service-containers)
+  postgres:
+    image: postgres-${{ env.postgres_version }}-alpine3.20
+    env:
+      POSTGRES_PASSWORD: ci_test
+      POSTGRES_USER: ci_test
+      POSTGRES_DB: kans_test
+    options: >-
+      --health-cmd pg_isready
+      --health-interval 10s
+      --health-timeout 5s
+      --health-retries 5
+    ports:
+      - 5432:5432
+
+jobs:
+  test-on-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Checkout the source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set image tag
+        run: |
+          echo "image_tag2=elixir-act-pipeline:$(head -n 1 \
+            ./apps/elixir/app/VERSION | tr -d '\n')" >> "$GITHUB_ENV"
+
+      - name: Build an image with `Dockerfile.alpine.test`
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/elixir/app
+          platforms: linux/arm64/v8
+          file: ./Dockerfile.alpine.test
+          build-args: |
+            Elixir_version=${{ env.Elixir_version }}
+          load: true
+          tags: ${{ env.image_tag2 }}
+
+      - name: Run the tests
+        run: |
+          docker run --rm ${{ env.image_tag2 }}
+
+      # - name: Tag (Latest) and push
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     platforms: linux/amd64,linux/arm64
+      #     push: true
+      #     tags: ${{ env.image_tag3 }}

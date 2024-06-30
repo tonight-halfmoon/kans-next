@@ -1,4 +1,5 @@
-FROM elixir:1.16.2-alpine as compile
+ARG Elixir_version ?= 1.16.2
+FROM elixir:${Elixir_version}-alpine as compile
 
 WORKDIR /src
 
@@ -7,7 +8,7 @@ ENV MIX_ENV="test"
 RUN \
   --mount=type=cache,target=/var/cache/apk/ \
   apk --no-cache --update-cache --force-missing-repositories upgrade && \
-  apk add --no-cache git~=2.43 openssl~=3.1.5 \
+  apk add --no-cache git~=2.43 openssl~=3.1.6 \
     mkcert~=1.4.4 --update-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing/ --allow-untrusted && \
   addgroup --gid 10000 -S jpat && \
   adduser --uid 10000 -G jpat -S jpat && \

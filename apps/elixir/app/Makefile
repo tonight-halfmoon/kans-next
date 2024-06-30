@@ -25,6 +25,8 @@ source_rev := $(shell tr -d '\n' <./VERSION)
 
 git_commit_sha := $(shell git rev-parse HEAD | cut -c1-7)
 
+Elixir_version=1.16.2
+
 export
 
 install: ## Install hex, rebar and app dependencies
@@ -155,6 +157,7 @@ image_cleanup: ## Delete the images (docker)
 image_build_ci_testing: ## Build an image to run tests (docker)
 ifeq ($(MIX_ENV), test)
 	docker build \
+		--build-arg Elixir_version=$(Elixir_version) \
 		--label kans.source_revision=$(source_rev) \
 		--tag elixir-$(MIX_ENV):$(source_rev) \
 		--file Dockerfile.alpine.test \
