@@ -1,6 +1,5 @@
-ARG ELIXIR_VERSION=1.16.2
-
-FROM elixir:${ELIXIR_VERSION}-alpine as build
+ARG Elixir_version ?= 1.16.2
+FROM elixir:${elixir_version}-alpine as build
 
 ARG parameter_mix_env
 ENV MIX_ENV=${parameter_mix_env?}
