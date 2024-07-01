@@ -38,4 +38,5 @@ codespell_check: ## Run codespell to check misspelling
 
 act: ## Run `act` (GitHub Actions Run Locally); Utilise either act --pull=false or act --action-offline-mode
 	type gh
-	act --action-offline-mode --secret GITHUB_TOKEN=.$(gh auth token)
+	type act
+	act --remote-name=kans-next --action-offline-mode --secret GITHUB_TOKEN=.$(gh auth token)
