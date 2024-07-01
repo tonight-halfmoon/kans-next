@@ -61,9 +61,9 @@ jobs:
       - name: Build an image with `Dockerfile.alpine.test`
         uses: docker/build-push-action@v5
         with:
-          context: ./apps/elixir/app
+          context: ./apps/elixir/app/
           platforms: linux/arm64/v8
-          file: ./Dockerfile.alpine.test
+          file: ./apps/elixir/app/Dockerfile.alpine.test
           build-args: |
             Elixir_version=${{ env.Elixir_version }}
           load: true
