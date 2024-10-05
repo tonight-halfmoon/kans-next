@@ -11,7 +11,7 @@ repo_root_dir="$(git -C "${source_dir}" rev-parse --show-toplevel)"
 
 base_dir="${repo_root_dir}"/kp15s/base
 
-host=jpat.test
+host=jpat.io
 os_name="$(uname -s | tr '[:upper:]' '[:lower:]')"
 xss="$(if [[ "${os_name}" = *linux* ]]; then echo ".XXXXXX"; else echo ""; fi)"
 

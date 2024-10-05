@@ -29,7 +29,7 @@ EOF
   return 0
 }
 
-host=jpat.test
+host=jpat.io
 
 program_name="$(basename "${0}")"
 

@@ -51,7 +51,7 @@ FROM compile as test
 ENV MIX_ENV="test"
 
 RUN <<EOT
-  mkcert -key-file /etc/tls/tls.key -cert-file /etc/tls/tls.crt jpat.test "*.jpat.test"
+  mkcert -key-file /etc/tls/tls.key -cert-file /etc/tls/tls.crt test.jpat.io "*.test.jpat.io"
   chown 10000:10000 /etc/tls/tls.key
   chown 10000:10000 /etc/tls/tls.crt
   tls_key=/etc/tls/client.key

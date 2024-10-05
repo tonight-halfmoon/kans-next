@@ -23,7 +23,7 @@ IFS="$(printf ' \t')"
 repo_root_dir=$(git -C . rev-parse --show-toplevel)
 program_name="$(basename "${0}")"
 
-host_name=jpat.test
+host_name=jpat.io
 
 usage() {
   usage_doc="$(
@@ -67,6 +67,7 @@ if [ "${url_scheme}" = https ]; then
   client_key="${5:?Expected client certificate Key! $(usage)}"
   ca_crt="${6:?Expected CA .[crt|pem]! $(usage)}"
   cert_type=PEM
+  pkey="$("${repo_root_dir}"/opt/private-key-gen.bash)"
   this_jwt="$("${repo_root_dir}"/opt/jwt/jwt-gen.bash s_X "${pkey}")"
 
   printf '%s\n' "Generated a JWT token - (showing only first 4 characters): $(cut -c -4 <<<"${this_jwt}")"

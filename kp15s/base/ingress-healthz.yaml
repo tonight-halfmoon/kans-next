@@ -13,7 +13,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: jpat.test
+    - host: jpat.io
       http:
         paths:
           - backend:
@@ -26,4 +26,4 @@ spec:
   tls:
     - secretName: tls-secret
       hosts:
-        - jpat.test
+        - jpat.io

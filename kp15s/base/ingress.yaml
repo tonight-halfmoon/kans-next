@@ -14,11 +14,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - jpat.test
+        - jpat.io
       secretName: tls-secret
   ingressClassName: nginx
   rules:
-    - host: jpat.test
+    - host: jpat.io
       http:
         paths:
           - backend:

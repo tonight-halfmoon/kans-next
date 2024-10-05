@@ -57,7 +57,7 @@ if config_env() != :test do
     pool_size: 10
 end
 
-host = System.get_env("PHX_HOST") || "jpat.test"
+host = System.get_env("PHX_HOST") || "jpat.io"
 port = String.to_integer(System.get_env("API_PORT") || "4001")
 port_actuator = String.to_integer(System.get_env("ACTUATOR_PORT") || "3001")
 scheme = "https"

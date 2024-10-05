@@ -99,7 +99,7 @@ USER nobody
 # above and adding an entrypoint. See https://github.com/krallin/tini for details
 # ENTRYPOINT ["/tini", "--"]
 
-ENV PHX_HOST="jpat.test"
+ENV PHX_HOST="jpat.io"
 ENV PHX_SERVER=true
 
 CMD ["/app/bin/server"]

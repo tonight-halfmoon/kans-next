@@ -63,7 +63,7 @@ COPY --from=build --chown=10000:10000 /app/_build/${MIX_ENV}/rel/kans ./
 
 USER 10000:10000
 
-ENV PHX_HOST="jpat.test"
+ENV PHX_HOST="jpat.io"
 ENV PHX_SERVER=true
 
 COPY --chown=10000:10000 ./entrypoint.alpine.sh ./

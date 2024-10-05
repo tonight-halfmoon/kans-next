@@ -16,9 +16,8 @@ deploy_app: ## Kustomize Build a particular app/environment with plugins enabled
 diff_app: ## Kustomize Build a particular app/environment with plugins enabled and pipe to kubectl diff; Command Line Argument example: app=elixir env=dev
 	kustomize build --enable-alpha-plugins --enable-exec .$(repo_root_dir)/apps/$(app)/overlays/$(env) | kubectl diff --filename -
 
-deploy_monitoring_installation: ## Monitoring installation
-	helm repo add prometheus-community \
-		https://prometheus-community.github.io/helm-charts
+deploy_kube_prometheus_stack: ## Deploy Kube Prometheus Stack (Monitoring)
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	helm upgrade --install \
 		-f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/samples/monitoring/kube-stack-config.yaml \
 		prometheus-community \
